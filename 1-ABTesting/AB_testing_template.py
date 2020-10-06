@@ -172,4 +172,4 @@ print("For %d samples of optimal sample size %d, %3.2f%% rejected the null" %
 df_sample_summary = pd.DataFrame(data={'sample number': list(
     range(0, num_samples)), 'z_score': z_score_list, 'p_value': p_value_list})
 print(df_sample_summary[['sample number', 'z_score', 'p_value']])
-df_sample_summary.to_csv('sample_summary.csv', index=False)
+df_sample_summary.to_csv('1-ABTesting/sample_summary.csv', index=False)
