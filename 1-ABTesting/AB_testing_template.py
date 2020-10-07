@@ -54,14 +54,14 @@ def reject_null(variantA_outcomes_f, variantB_outcomes_f, alpha_f, num_sides_f):
     return reject_null_TF_f, z_score, p_value
 
 
-def calc_optimal_sample_size(p0_f, mde_f, alpha_f, power_f):
+def calc_optimal_sample_size(p0_f,mde_f, alpha_f, power_f):
     t_alpha2 = abs(norm.ppf(alpha_f/2))
     t_beta = abs(norm.ppf(1-power_f))
     p1_f = p0_f + mde_f
     p_avg = (p0_f + (p0_f + mde_f))/2
     # Replace None with formula
     sample_size = (((t_alpha2*np.sqrt(2*p_avg*(1-p_avg)))+(t_beta *
-                                                           np.sqrt(p0_f*(1-p0_f)+p1_f*(1-p1_f))))**2) * (1/(power_f))
+                                                           np.sqrt(p0_f*(1-p0_f)+p1_f*(1-p1_f))))**2) * (1/(mde_f**2))
     return sample_size
 
 
