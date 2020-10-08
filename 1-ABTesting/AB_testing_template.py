@@ -50,7 +50,7 @@ def reject_null(variantA_outcomes_f, variantB_outcomes_f, alpha_f, num_sides_f):
     p_value = get_p_value(z_score, num_sides_f)
     z_crit = get_z_crit_value(alpha_f, num_sides_f)
     # Replace None with formula. This should result in a boolean variable (True or False). You can check the variable type in the console with the command: "type(reject_null_TF_f)"
-    reject_null_TF_f = (z_score >= z_crit)
+    reject_null_TF_f = (p_value < alpha_f)
     return reject_null_TF_f, z_score, p_value
 
 
