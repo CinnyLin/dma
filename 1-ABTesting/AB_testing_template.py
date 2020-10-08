@@ -31,14 +31,14 @@ def calc_zscore(phat, p, n_f):
 def get_z_crit_value(alpha_f, num_sides_f):
     # Replace None with formula; hint: use norm.ppf package
     # norm.ppf(significance_level, loc=mean, scale=std)
-    z_crit_value_f = norm.ppf(1-(alpha_f/num_sides_f))
+    z_crit_value_f = norm.ppf(alpha_f/num_sides_f)
     return z_crit_value_f
 
 
 def get_p_value(zscore_f, num_sides_f):
     # Replace None with formula; hint: use norm.cdf package
     # norm.cdf(x, loc=mean, scale=std)
-    p_value_f = norm.cdf(zscore_f)*num_sides_f
+    p_value_f = (1-norm.cdf(zscore_f,loc=0,scale=1))*num_sides_f
     return p_value_f
 
 
@@ -50,7 +50,7 @@ def reject_null(variantA_outcomes_f, variantB_outcomes_f, alpha_f, num_sides_f):
     p_value = get_p_value(z_score, num_sides_f)
     z_crit = get_z_crit_value(alpha_f, num_sides_f)
     # Replace None with formula. This should result in a boolean variable (True or False). You can check the variable type in the console with the command: "type(reject_null_TF_f)"
-    reject_null_TF_f = (p_value <= alpha_f)
+    reject_null_TF_f = (abs(z_score) >= z_crit and p_value <= alpha_f)
     return reject_null_TF_f, z_score, p_value
 
 
