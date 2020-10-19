@@ -20,8 +20,8 @@ def run_kmeans(n_clusters_f, init_f, df_f):
     # The output of this function should be the input data frame will the model object KMeans and a data summary. The
     # function will need to add an additional column to the input dataframe called 'predict_cluster_kmeans'
     # that contains the cluster labels assigned by the algorithm.
-
-    k_means_model_f = None
+    k_means_model_f = KMeans(n_clusters=n_clusters_f, n_init=init_f)
+    k_means_model_f.fit(df_f)
 
     # summarize cluster attributes
     k_means_model_f_summary = df_f.groupby(
@@ -30,7 +30,8 @@ def run_kmeans(n_clusters_f, init_f, df_f):
 
 
 # ------ Import data ------
-df_transactions = pd.read_pickle('transactions_n100000')
+df_transactions = pd.read_csv(
+    '2-CustomerSegmentation/transactions_n100000.csv')
 
 # ------ Engineer features -----
 # --- convert from long to wide
@@ -44,13 +45,24 @@ df = df.merge(df_transactions[['ticket_id', 'location', 'order_timestamp']
                               ].drop_duplicates(), how='left', on='ticket_id')
 
 # --- extract hour of day from datetime
-df['hour'] = df.order_timestamp.apply(lambda x: x.hour)
+
+
+def get_hour(timestamp):
+    return timestamp.split()[1].split(':')[0]
+
+
+df['hour'] = df['order_timestamp'].apply(get_hour)
+# '''df['hour'] = df['order_timestamp'].apply(lambda x: x.hour)'''
 
 # --- convert categorical store variables to dummies
-encoded_data = None  # use sklearn.preprocessing.OneHotEncoder() to create a class object called encoded_data (see documentation for OneHotEncoder online)
-# call the method used to fit data for a OneHotEncorder object. Note: you will have to reshape data from a column of the data frame. useful functions may be DataFrame methods .to_list(), .reshape(), and .shape()
+# use sklearn.preprocessing.OneHotEncoder() to create a class object called encoded_data
+encoded_data = OneHotEncoder(handle_unknown='ignore')
+# call the method used to fit data for a OneHotEncorder object.
+# Note: you will have to reshape data from a column of the data frame.
+# useful functions may be DataFrame methods .to_list(), .reshape(), and .shape()
+'''encoded_data.fit(X=np.array(df['location'].tolist()).reshape(df.shape[0], 1))'''
 col_map_store_binary = dict(zip(list(encoded_data.get_feature_names()), [
-                            'store_' + x.split('x0_')[1] for x in encoded_data.get_feature_names()]))
+    'store_' + x.split('x0_')[1] for x in encoded_data.get_feature_names()]))
 
 df_store_binary = pd.DataFrame(encoded_data.transform(
     X=np.array(df['location'].tolist()).reshape(df.shape[0], 1)))
@@ -93,6 +105,23 @@ model, model_summary = run_kmeans(
 
 # --- draw elbow plot
 # create an elbow plot for your numbers of clusters in previous step
+
+'''
+ks = range(1,16)
+inertias = []
+
+for k in ks:
+    model = KMeans(n_clusters=k, n_init=10)
+    model.fit(df)
+    inertias.append(model.inertia_)
+    
+plt.plot(ks, inertias, '-o')
+plt.xlabel('number of clusters, k')
+plt.ylabel('inertia')
+plt.xticks(ks)
+plt.show()
+'''
+
 
 # --- output tagged data for examination ----
 store_col_names = ['store_1', 'store_2', 'store_3', 'store_4',
