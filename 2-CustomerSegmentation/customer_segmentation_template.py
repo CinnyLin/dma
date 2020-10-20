@@ -1,6 +1,7 @@
 # ------ Import module ------
 import pandas as pd
 import numpy as np
+import re
 
 from sklearn.mixture import GaussianMixture
 from sklearn.model_selection import train_test_split
@@ -20,13 +21,18 @@ def run_kmeans(n_clusters_f, init_f, df_f):
     # The output of this function should be the input data frame will the model object KMeans and a data summary. The
     # function will need to add an additional column to the input dataframe called 'predict_cluster_kmeans'
     # that contains the cluster labels assigned by the algorithm.
-    k_means_model_f = KMeans(n_clusters=n_clusters_f, n_init=init_f)
+    k_means_model_f = KMeans(n_clusters=n_clusters_f, init=init_f)
     k_means_model_f.fit(df_f)
+    df_f['predict_cluster_kmeans'] = k_means_model_f.labels_
 
     # summarize cluster attributes
     k_means_model_f_summary = df_f.groupby(
         'predict_cluster_kmeans').agg(attribute_summary_method_dict)
     return k_means_model_f, k_means_model_f_summary
+
+
+def get_hour(timestamp):
+    return int(timestamp.split()[1].split(':')[0])
 
 
 # ------ Import data ------
@@ -45,14 +51,8 @@ df = df.merge(df_transactions[['ticket_id', 'location', 'order_timestamp']
                               ].drop_duplicates(), how='left', on='ticket_id')
 
 # --- extract hour of day from datetime
-
-
-def get_hour(timestamp):
-    return timestamp.split()[1].split(':')[0]
-
-
 df['hour'] = df['order_timestamp'].apply(get_hour)
-# '''df['hour'] = df['order_timestamp'].apply(lambda x: x.hour)'''
+# df['hour'] = df['order_timestamp'].apply(lambda x: x.hour)
 
 # --- convert categorical store variables to dummies
 # use sklearn.preprocessing.OneHotEncoder() to create a class object called encoded_data
@@ -60,12 +60,16 @@ encoded_data = OneHotEncoder(handle_unknown='ignore')
 # call the method used to fit data for a OneHotEncorder object.
 # Note: you will have to reshape data from a column of the data frame.
 # useful functions may be DataFrame methods .to_list(), .reshape(), and .shape()
-'''encoded_data.fit(X=np.array(df['location'].tolist()).reshape(df.shape[0], 1))'''
+encoded_data.fit(X=np.array(df['location'].tolist()).reshape(df.shape[0], 1))
+# fixed split with regex to avoid IndexError
 col_map_store_binary = dict(zip(list(encoded_data.get_feature_names()), [
-    'store_' + x.split('x0_')[1] for x in encoded_data.get_feature_names()]))
+    'store_' + re.split('x\d_', x)[1] for x in encoded_data.get_feature_names()]))
 
-df_store_binary = pd.DataFrame(encoded_data.transform(
-    X=np.array(df['location'].tolist()).reshape(df.shape[0], 1)))
+# fix transform data
+df_store_binary = pd.DataFrame(
+    encoded_data.fit_transform(df[['location']]).toarray())
+# df_store_binary = pd.DataFrame(encoded_data.transform(
+#    X=np.array(df['location'].tolist()).reshape(df.shape[0], 1)))
 df_store_binary.columns = encoded_data.get_feature_names()
 df_store_binary.rename(columns=col_map_store_binary, inplace=True)
 
@@ -77,8 +81,10 @@ n_clusters = 3
 init_point_selection_method = 'k-means++'
 
 # --- select data
-cols_for_clustering = None  # specify list of attributes on which to base clusters
-df_cluster = df.loc[:, cols_for_clustering]
+# specify list of attributes on which to base clusters
+cols_for_clustering = ['hour', 'location']
+df_cluster = df.reindex(columns=cols_for_clustering)
+# df_cluster = df.loc[:, cols_for_clustering]
 
 # --- split to test and train
 df_cluster_train, df_cluster_test, _, _, = train_test_split(
@@ -102,25 +108,21 @@ model, model_summary = run_kmeans(
 
 # --- run for various number of clusters
 # add the code to run the clustering algorithm for various numbers of clusters
-
-# --- draw elbow plot
-# create an elbow plot for your numbers of clusters in previous step
-
-'''
-ks = range(1,16)
+ks = range(1, 16)
 inertias = []
 
 for k in ks:
     model = KMeans(n_clusters=k, n_init=10)
-    model.fit(df)
+    model.fit(df_cluster)
     inertias.append(model.inertia_)
-    
+
+# --- draw elbow plot
+# create an elbow plot for your numbers of clusters in previous step
 plt.plot(ks, inertias, '-o')
 plt.xlabel('number of clusters, k')
 plt.ylabel('inertia')
 plt.xticks(ks)
 plt.show()
-'''
 
 
 # --- output tagged data for examination ----
