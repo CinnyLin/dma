@@ -138,11 +138,11 @@ df_cluster.to_csv('clustering_output.csv')
 # assign cluster mode to location
 t_df = df_cluster.groupby('store')['predict_cluster_kmeans'].apply(
     lambda x: x.mode()).reset_index()[['store', 'predict_cluster_kmeans']]
-# pd.concat([df_transactions[['location', 'lat', 'long']
-#                           ].drop_duplicates(), t_df], axis=1).to_csv('store_locations.csv')
-print()
-df_transactions[['location', 'lat', 'long']].drop_duplicates().merge(
-    t_df, how='left', left_on='location', right_on='store').to_csv('store_locations.csv')
+pd.concat([df_transactions[['location', 'lat', 'long']
+                           ].drop_duplicates(), t_df], axis=1).to_csv('store_locations.csv')
+# df_transactions[['location', 'lat', 'long']].drop_duplicates().merge(
+#    t_df, how='left', left_on='location', right_on='store').to_csv('store_locations.csv')
+# ValueError: You are trying to merge on int64 and object columns. If you wish to proceed you should use pd.concat
 
 # ---- Bonus code (not part of assignment) ------
 # GMM
