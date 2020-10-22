@@ -82,7 +82,8 @@ init_point_selection_method = 'k-means++'
 
 # --- select data
 # specify list of attributes on which to base clusters
-cols_for_clustering = ['hour', 'location']
+cols_for_clustering = ['burger', 'fries', 'salad', 'shake', 'hour', 'store_1', 'store_2', 'store_3', 'store_4',
+                       'store_5', 'store_6', 'store_7', 'store_8', 'store_9']
 df_cluster = df.reindex(columns=cols_for_clustering)
 # df_cluster = df.loc[:, cols_for_clustering]
 
@@ -137,6 +138,9 @@ df_cluster.to_csv('clustering_output.csv')
 # assign cluster mode to location
 t_df = df_cluster.groupby('store')['predict_cluster_kmeans'].apply(
     lambda x: x.mode()).reset_index()[['store', 'predict_cluster_kmeans']]
+# pd.concat([df_transactions[['location', 'lat', 'long']
+#                           ].drop_duplicates(), t_df], axis=1).to_csv('store_locations.csv')
+print()
 df_transactions[['location', 'lat', 'long']].drop_duplicates().merge(
     t_df, how='left', left_on='location', right_on='store').to_csv('store_locations.csv')
 
