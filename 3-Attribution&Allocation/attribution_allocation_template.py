@@ -112,7 +112,12 @@ def calc_avg_CAC(channel_allocation_f, channel_spend_f):
 
 
 def calc_marginal_CAC(n_conversions_low_tier, spend_low_tier, n_conversions_high_tier, spend_high_tier):
+    # RuntimeWarning: invalid value encountered in true_divide
+    np.seterr(divide='ignore', invalid='ignore')
     # fill in this code to create the three variables in output dictionary
+    marginal_conversions = n_conversions_high_tier - n_conversions_low_tier
+    marginal_spend = spend_high_tier - spend_low_tier
+    marginal_CAC = marginal_spend / marginal_conversions
     return {'marginal_conversions': marginal_conversions, 'marginal_spend': marginal_spend,
             'marginal_CAC': marginal_CAC}
 
@@ -130,9 +135,9 @@ write_to_file = True
 
 # ----- Import data -----
 df = pd.read_pickle(
-    '3-AttributionAllocation/attribution_allocation_student_data')
+    '3-Attribution&Allocation/attribution_allocation_student_data')
 channel_spend = pd.read_pickle(
-    '3-AttributionAllocation/channel_spend_student_data')
+    '3-Attribution&Allocation/channel_spend_student_data')
 
 # ##### This data set is large. As you work through the code,
 # you will find that executing some functions can take a long time (O(hours))
@@ -208,16 +213,19 @@ for model_type in select_model_types:
     for t_tier in df_tier_sum.index:
         for t_channel in df_CAC.index:
             if t_tier > 1:
-                n_conversions_low_tier = df_tier_sum.loc[t_tier - 1, t_channel]
+                n_conversions_low_tier = df_tier_sum.loc[t_tier -
+                                                         1, t_channel]
                 spend_low_tier = channel_spend['tier' +
                                                str(t_tier - 1)][t_channel]
-                n_conversions_high_tier = df_tier_sum.loc[t_tier, t_channel]
+                n_conversions_high_tier = df_tier_sum.loc[t_tier,
+                                                          t_channel]
                 spend_high_tier = channel_spend['tier' +
                                                 str(t_tier)][t_channel]
             else:
                 n_conversions_low_tier = 0
                 spend_low_tier = 0
-                n_conversions_high_tier = df_tier_sum.loc[t_tier, t_channel]
+                n_conversions_high_tier = df_tier_sum.loc[t_tier,
+                                                          t_channel]
                 spend_high_tier = channel_spend['tier' +
                                                 str(t_tier)][t_channel]
 
