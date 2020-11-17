@@ -130,6 +130,8 @@ for i in range(n_rows):
         axes[i, j].set(xlabel=select_coef, ylabel='Churn prob.')
 fig.legend(labels=['Churn T/F (actual)',
                    'Linear probability model', 'Logit probability'])
+plt.savefig('4-churn/prediction_data.png')
+plt.show()
 
 # compare lpm and logit predictions
 fig = plt.figure()
@@ -144,6 +146,8 @@ plt.xlabel('Linear Probability Model Prediction')
 plt.ylabel('Logit Model Prediction')
 fig.legend(labels=['Churn T/F (actual)',
                    'Linear probability model', 'Logit probability'])
+plt.savefig('4-churn/lpm_logit_compare.png')
+plt.show()
 
 # --- evaluate model predictions using numerical quantification (ROC curves)
 # make confusion matrices
@@ -161,6 +165,8 @@ plt.title('ROC curves')
 plt.xlabel('False positives (positive=churn)')
 plt.ylabel('True positives (positive=churn)')
 plt.legend(labels=['Linear probability model', 'Logit probability'])
+plt.savefig('4-churn/ROC.png')
+plt.show()
 
 # ----- TEST RETENTION OFFER SCENARIOS -----
 # evaluate the impact of an offer
@@ -229,6 +235,8 @@ plt.title('Lift curves')
 plt.xlabel('Threshold probability for predicting customer churns')
 plt.ylabel('Revenue lift from base scenario of making no retention offer')
 plt.legend(labels=['Linear probability model', 'Logit probability'])
+plt.savefig('4-churn/lift_curves.png')
+plt.show()
 
 # Acceptance rate sensitivity
 fig = plt.figure()
@@ -241,6 +249,8 @@ plt.title('Lift curves')
 plt.xlabel('Offer acceptance rate for those who would churn')
 plt.ylabel('Revenue lift from base scenario of making no retention offer')
 plt.legend(labels=['Linear probability model', 'Logit probability'])
+plt.savefig('4-churn/acceptance_rate.png')
+plt.show()
 
 # Discount amount sensitivity
 fig = plt.figure()
@@ -253,3 +263,5 @@ plt.title('Lift curves')
 plt.xlabel('Offer discount amount')
 plt.ylabel('Revenue lift from base scenario of making no retention offer')
 plt.legend(labels=['Linear probability model', 'Logit probability'])
+plt.savefig('4-churn/discount_amount.png')
+plt.show()
