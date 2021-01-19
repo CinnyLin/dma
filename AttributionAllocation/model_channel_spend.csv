@@ -1,0 +1,16 @@
+model,channel,spend
+last_touch_point,social,3000
+last_touch_point,display,2000
+last_touch_point,referral,3000
+last_touch_point,paid_search,1000
+last_touch_point,email,2000
+first_touch_point,display,2000
+first_touch_point,referral,3000
+first_touch_point,social,3000
+first_touch_point,email,2000
+first_touch_point,paid_search,1000
+last_non_direct,display,2000
+last_non_direct,referral,3000
+last_non_direct,social,3000
+last_non_direct,email,3000
+last_non_direct,paid_search,1000
